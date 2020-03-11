@@ -21,10 +21,8 @@ package my.com.kylogger.johnmelodyme.internet.locationtracker;
  * @Class: LocationActivity.class
  */
 
+import android.Manifest;
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -55,7 +53,6 @@ public class LocationActivity extends AppCompatActivity {
 
     public void DeclarationInit() {
         StartTracking = findViewById(R.id.btn_start);
-        StopTracking = findViewById(R.id.btn_stop);
         LA = findViewById(R.id.LA);
         LONG = findViewById(R.id.Long);
     }
@@ -67,14 +64,13 @@ public class LocationActivity extends AppCompatActivity {
         Log.d(TAG, "Starting " + LocationActivity.class.getSimpleName());
         DeclarationInit();
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-
-
-            if (permissionsToRequest.size() > 0)
-                requestPermissions((String[])
-                        permissionsToRequest.toArray(new String[permissionsToRequest.size()]),
-                        ALL_PERMISSIONS_RESULT);
-        }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            if (permissionsToRequest.size() > 0){
+//                requestPermissions((String[])
+//                        permissionsToRequest.toArray(new String[permissionsToRequest.size()]),
+//                        ALL_PERMISSIONS_RESULT);
+//            }
+//        }
 
         permissions.add(ACCESS_FINE_LOCATION);
         permissions.add(ACCESS_COARSE_LOCATION);
@@ -88,10 +84,7 @@ public class LocationActivity extends AppCompatActivity {
             public void onClick(View v) {
                 locationTrack = new LocationTrack(LocationActivity.this);
 
-
                 if (locationTrack.canGetLocation()) {
-
-
                     double longitude = locationTrack.getLongitude();
                     double latitude = locationTrack.getLatitude();
                     String LG = String.valueOf(longitude);
@@ -99,8 +92,10 @@ public class LocationActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Longitude:" + longitude +
                             "\nLatitude:" + latitude, Toast.LENGTH_SHORT).show();
 
-                    LONG.setText(Double.toString(longitude));
-                    LA.setText(Double.toString(latitude));
+                    LONG.setText("Longitude: " + longitude);
+                    LA.setText("Latitude: " + latitude);
+
+                    Log.d(TAG, "Longitude: " + longitude + "   "+ "Latitude: " + latitude);
                 } else {
 
                     locationTrack.showSettingsAlert();
@@ -135,47 +130,29 @@ public class LocationActivity extends AppCompatActivity {
     }
 
 
-    @TargetApi(Build.VERSION_CODES.M)
+    @SuppressLint("SetTextI18n")
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        switch (requestCode) {
-            case ALL_PERMISSIONS_RESULT:
-                for (Object perms : permissionsToRequest) {
-                    if (!hasPermission(perms)) {
-                        permissionsRejected.add(perms);
-                    }
+        if (requestCode == ALL_PERMISSIONS_RESULT) {
+            if (permissions.length == 1 &&
+                    permissions[0] == Manifest.permission.ACCESS_FINE_LOCATION &&
+                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                locationTrack = new LocationTrack(LocationActivity.this);
+                if (locationTrack.canGetLocation()) {
+                    double longitude = locationTrack.getLongitude();
+                    double latitude = locationTrack.getLatitude();
+                    String LG = String.valueOf(longitude);
+                    String La = String.valueOf(latitude);
+                    Toast.makeText(getApplicationContext(), "Longitude:" + longitude +
+                            "\nLatitude:" + latitude, Toast.LENGTH_SHORT).show();
+
+                    LONG.setText(Double.toString(longitude));
+                    LA.setText(Double.toString(latitude));
+            } else {
+                    locationTrack.showSettingsAlert();
                 }
-
-                if (permissionsRejected.size() > 0) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        if (shouldShowRequestPermissionRationale((String) permissionsRejected.get(0))) {
-                            showMessageOKCancel("These permissions are mandatory for the application. Please allow access.",
-                                    new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                                requestPermissions((String[]) permissionsRejected.toArray(new String[permissionsRejected.size()]), ALL_PERMISSIONS_RESULT);
-                                            }
-                                        }
-                                    });
-                            return;
-                        }
-                    }
-
-                }
-
-                break;
+            }
         }
-
-    }
-
-    private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
-        new AlertDialog.Builder(LocationActivity.this)
-                .setMessage(message)
-                .setPositiveButton("OK", okListener)
-                .setNegativeButton("Cancel", null)
-                .create()
-                .show();
     }
 
     @Override
