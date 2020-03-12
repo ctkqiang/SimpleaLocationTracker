@@ -43,7 +43,7 @@ import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
 public class LocationActivity extends AppCompatActivity {
     private static final String TAG = "GPSTRACKER";
-    private final static int ALL_PERMISSIONS_RESULT = 101;
+    private static final int ALL_PERMISSIONS_RESULT = 0x65;
     public static LocationTrack locationTrack;
     private ArrayList permissionsToRequest;
     private ArrayList permissionsRejected = new ArrayList();

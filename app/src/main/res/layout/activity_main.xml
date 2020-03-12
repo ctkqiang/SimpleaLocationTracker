@@ -31,6 +31,7 @@
             android:layout_marginTop="32dp"
             android:text="TextView"
             android:textAlignment="center"
+            android:textColor="@color/colorPrimary"
             android:textSize="24sp" />
 
         <TextView
@@ -39,6 +40,7 @@
             android:layout_height="wrap_content"
             android:text="TextView"
             android:textAlignment="center"
+            android:textColor="@color/colorPrimary"
             android:textSize="24sp" />
 
     </LinearLayout>
