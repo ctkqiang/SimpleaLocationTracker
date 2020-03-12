@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">Location Tracker</string>
     <string name="Start">Start</string>
+    <string name="GPSisnoton">GPS is not Enabled!</string>
+    <string name="enableGS">Do you want to turn on GPS?</string>
+    <string name="y">Yes</string>
+    <string name="n">No</string>
 </resources>

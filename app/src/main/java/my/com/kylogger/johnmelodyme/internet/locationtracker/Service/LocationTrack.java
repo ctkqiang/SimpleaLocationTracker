@@ -17,6 +17,8 @@ import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
 
+import my.com.kylogger.johnmelodyme.internet.locationtracker.R;
+
 public class LocationTrack extends Service implements LocationListener {
 
     private final Context mContext;
@@ -35,9 +37,7 @@ public class LocationTrack extends Service implements LocationListener {
 
 
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10;
-
-
-    private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1;
+    private static final long MIN_TIME_BW_UPDATES = 1000 * 60;
     protected LocationManager locationManager;
 
     public LocationTrack(Context mContext) {
@@ -50,15 +50,12 @@ public class LocationTrack extends Service implements LocationListener {
         try {
             locationManager = (LocationManager) mContext
                     .getSystemService(LOCATION_SERVICE);
-
             // get GPS status
             checkGPS = locationManager
                     .isProviderEnabled(LocationManager.GPS_PROVIDER);
-
             // get network provider status
             checkNetwork = locationManager
                     .isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-
             if (!checkGPS && !checkNetwork) {
                 Toast.makeText(mContext, "No Service Provider is available", Toast.LENGTH_SHORT).show();
             } else {
@@ -93,11 +90,7 @@ public class LocationTrack extends Service implements LocationListener {
 
 
                 }
-
-
                 /*if (checkNetwork) {
-
-
                     if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                         // TODO: Consider calling
                         //    ActivityCompat#requestPermissions
@@ -126,7 +119,6 @@ public class LocationTrack extends Service implements LocationListener {
 
             }
 
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -149,34 +141,24 @@ public class LocationTrack extends Service implements LocationListener {
     }
 
     public boolean canGetLocation() {
+        /////////
         return this.canGetLocation;
     }
 
     public void showSettingsAlert() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(mContext);
-
-
-        alertDialog.setTitle("GPS is not Enabled!");
-
-        alertDialog.setMessage("Do you want to turn on GPS?");
-
-
-        alertDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+        alertDialog.setTitle(getResources().getString(R.string.GPSisnoton));
+        alertDialog.setMessage(getResources().getString(R.string.enableGS));
+        alertDialog.setPositiveButton(getResources().getString(R.string.y), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                 mContext.startActivity(intent);
             }
-        });
-
-
-        alertDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
+        }).setNegativeButton(getResources().getString(R.string.n), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
             }
-        });
-
-
-        alertDialog.show();
+        }).show();
     }
 
 
