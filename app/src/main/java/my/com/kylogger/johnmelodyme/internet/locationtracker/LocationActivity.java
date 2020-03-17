@@ -23,9 +23,11 @@ package my.com.kylogger.johnmelodyme.internet.locationtracker;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -33,6 +35,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.shashank.sony.fancytoastlib.FancyToast;
 
 import java.util.ArrayList;
 
@@ -50,11 +54,14 @@ public class LocationActivity extends AppCompatActivity {
     private ArrayList permissions = new ArrayList();
     private Button StartTracking, StopTracking;
     private TextView LONG, LA;
+    private ProgressDialog dialog;
+    private Handler handler;
 
     public void DeclarationInit() {
         StartTracking = findViewById(R.id.btn_start);
-        LA = findViewById(R.id.LA);
+//        LA = findViewById(R.id.LA);
         LONG = findViewById(R.id.Long);
+        handler = new Handler();
     }
 
     @Override
@@ -82,26 +89,47 @@ public class LocationActivity extends AppCompatActivity {
             @SuppressLint("SetTextI18n")
             @Override
             public void onClick(View v) {
-                locationTrack = new LocationTrack(LocationActivity.this);
-
-                if (locationTrack.canGetLocation()) {
-                    double longitude = locationTrack.getLongitude();
-                    double latitude = locationTrack.getLatitude();
-                    String LG = String.valueOf(longitude);
-                    String La = String.valueOf(latitude);
-                    Toast.makeText(getApplicationContext(), "Longitude:" + longitude +
-                            "\nLatitude:" + latitude, Toast.LENGTH_SHORT).show();
-
-                    LONG.setText("Longitude: " + longitude);
-                    LA.setText("Latitude: " + latitude);
-
-                    Log.d(TAG, "Longitude: " + longitude + "   "+ "Latitude: " + latitude);
-                } else {
-
-                    locationTrack.showSettingsAlert();
-                }
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        dialog = ProgressDialog.show(LocationActivity.this,
+                                "",
+                                "Getting GPS data \uD83D\uDEF0......",
+                                true);
+                        STARTLOCATION();
+                    }
+                },3);
             }
         });
+
+        StartTracking.setOnLongClickListener(new View.OnLongClickListener() {
+            @SuppressLint("SetTextI18n")
+            @Override
+            public boolean onLongClick(View v) {
+                StartTracking.setText("Start");
+                LONG.setText(null);
+                return true;
+            }
+        });
+    }
+
+    @Override
+    public void onStart(){
+        super.onStart();
+        LONG.setVisibility(View.INVISIBLE);
+        StartTracking.animate();
+//        StartTracking.setText("Stop");
+//        String PROVIDER = Settings.Secure.getString(getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
+//        if(PROVIDER != null){
+//            StartTracking.setEnabled(true);
+//        }else{
+//            StartTracking.setEnabled(false);
+//            Intent intent;
+//            intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+//            startActivityForResult(intent, ALL_PERMISSIONS_RESULT);
+//            finish();
+//        }
+//        STARTLOCATION();
     }
 
     private ArrayList findUnAskedPermissions(ArrayList wanted) {
@@ -129,7 +157,6 @@ public class LocationActivity extends AppCompatActivity {
         return (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1);
     }
 
-
     @SuppressLint("SetTextI18n")
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -145,19 +172,45 @@ public class LocationActivity extends AppCompatActivity {
                     String La = String.valueOf(latitude);
                     Toast.makeText(getApplicationContext(), "Longitude:" + longitude +
                             "\nLatitude:" + latitude, Toast.LENGTH_SHORT).show();
-
                     LONG.setText(Double.toString(longitude));
                     LA.setText(Double.toString(latitude));
-            } else {
+                } else {
                     locationTrack.showSettingsAlert();
                 }
             }
         }
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onDestroy() {
         super.onDestroy();
         locationTrack.stopListener();
+        LONG.setText(null);
+        StartTracking.setText("Start");
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void STARTLOCATION() {
+        LONG.setVisibility(View.VISIBLE);
+        StartTracking.setText("Stop");
+        locationTrack = new LocationTrack(LocationActivity.this);
+        dialog.dismiss();
+        if (locationTrack.canGetLocation()) {
+            double longitude = locationTrack.getLongitude();
+            double latitude = locationTrack.getLatitude();
+            String LG = String.valueOf(longitude);
+            String La = String.valueOf(latitude);
+            //Toast.makeText(getApplicationContext(), "Longitude:" + longitude + "\nLatitude:" + latitude, Toast.LENGTH_SHORT).show();
+            FancyToast.makeText(this,
+                    "Longitude: " + longitude + "\n" + "Latitude: " + latitude,
+                    FancyToast.LENGTH_LONG,
+                    FancyToast.INFO,
+                    true);
+            LONG.setText("Longitude: " + longitude + "\n" + "Latitude: " + latitude);
+            Log.d(TAG, "Longitude: " + longitude + " || " + "Latitude: " + latitude);
+        } else {
+            locationTrack.showSettingsAlert();
+        }
     }
 }

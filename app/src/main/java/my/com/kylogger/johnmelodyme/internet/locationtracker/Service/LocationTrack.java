@@ -51,11 +51,15 @@ public class LocationTrack extends Service implements LocationListener {
             locationManager = (LocationManager) mContext
                     .getSystemService(LOCATION_SERVICE);
             // get GPS status
-            checkGPS = locationManager
-                    .isProviderEnabled(LocationManager.GPS_PROVIDER);
+            if (locationManager != null) {
+                checkGPS = locationManager
+                        .isProviderEnabled(LocationManager.GPS_PROVIDER);
+            }
             // get network provider status
-            checkNetwork = locationManager
-                    .isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+            if (locationManager != null) {
+                checkNetwork = locationManager
+                        .isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+            }
             if (!checkGPS && !checkNetwork) {
                 Toast.makeText(mContext, "No Service Provider is available", Toast.LENGTH_SHORT).show();
             } else {
@@ -203,4 +207,6 @@ public class LocationTrack extends Service implements LocationListener {
     public void onProviderDisabled(String s) {
 
     }
+
+
 }
