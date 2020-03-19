@@ -35,6 +35,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.shashank.sony.fancytoastlib.FancyToast;
 
@@ -62,6 +63,8 @@ public class LocationActivity extends AppCompatActivity {
 //        LA = findViewById(R.id.LA);
         LONG = findViewById(R.id.Long);
         handler = new Handler();
+
+        // REQ PERM
     }
 
     @Override
@@ -108,6 +111,7 @@ public class LocationActivity extends AppCompatActivity {
             public boolean onLongClick(View v) {
                 StartTracking.setText("Start");
                 LONG.setText(null);
+                Log.d(TAG, "onLongClick: LONG.setText(null); " );
                 return true;
             }
         });
@@ -130,6 +134,18 @@ public class LocationActivity extends AppCompatActivity {
 //            finish();
 //        }
 //        STARTLOCATION();
+    }
+
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            //
+        }
     }
 
     private ArrayList findUnAskedPermissions(ArrayList wanted) {
